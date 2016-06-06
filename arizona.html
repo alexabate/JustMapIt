@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js" charset="utf-8"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+
+   
+   
+   
+   
+
+   <style>
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .legend {
+          padding: 0px 0px;
+          font: 10px sans-serif;
+          background: white;
+          background: rgba(255,255,255,0.8);
+          box-shadow: 0 0 15px rgba(0,0,0,0.2);
+          border-radius: 5px;
+      }
+
+      .key path {
+        display: none;
+      }
+
+   </style>
+</head>
+
+<body>
+
+   <div id="map" style="width: 100%; height: 100%"></div>
+
+   <script>
+
+      queue()
+          .defer(d3.json, 'median_income.json')
+          .defer(d3.json, 'arizona.json')
+          .await(makeMap)
+
+      function onEachFeature(feature, layer) {
+          // does this feature have a property named popupContent?
+          if (feature.properties && feature.properties.popupContent) {
+              layer.bindPopup(feature.properties.popupContent);
+              }
+          };
+
+      function makeMap(error, data_1,gjson_1) {
+
+          
+
+          
+
+          function matchKey(datapoint, key_variable){
+              if (typeof key_variable[0][datapoint] === 'undefined') {
+                  return null;
+              }
+              else {
+                  return parseFloat(key_variable[0][datapoint]);
+              };
+          };
+
+          
+          var color = d3.scale.threshold()
+              .domain([15000.000000000004, 22922.132037236985, 35028.27580883507, 53528.184208458086, 81798.67374265465, 124999.99999999996])
+              .range(['#FFFFCC', '#D9F0A3', '#ADDD8E', '#78C679', '#41AB5D', '#238443', '#005A32']);
+          
+
+          var map = L.map('map').setView([32.2, -110.94], 11);
+
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 18,
+              minZoom: 1,
+              attribution: 'Map data (c) <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+          }).addTo(map);
+
+          
+          function style_1(feature) {
+    return {
+        fillColor: color(matchKey(feature.properties.GEOID, data_1)),
+        weight: 1,
+        opacity: 0.2,
+        color: 'black',
+        fillOpacity: 0.7
+    };
+}
+          
+
+          
+          gJson_layer_1 = L.geoJson(gjson_1, {style: style_1,onEachFeature: onEachFeature}).addTo(map)
+          
+
+          
+              var legend = L.control({position: 'topright'});
+
+    legend.onAdd = function (map) {var div = L.DomUtil.create('div', 'legend'); return div};
+
+    legend.addTo(map);
+
+    var x = d3.scale.linear()
+    .domain([0, 137499])
+    .range([0, 400]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("top")
+        .tickSize(1)
+        .tickValues([15000.000000000004, 22922.132037236985, 35028.27580883507, 53528.184208458086, 81798.67374265465, 124999.99999999996]);
+
+    var svg = d3.select(".legend.leaflet-control").append("svg")
+        .attr("id", 'legend')
+        .attr("width", 450)
+        .attr("height", 40);
+
+    var g = svg.append("g")
+        .attr("class", "key")
+        .attr("transform", "translate(25,16)");
+
+    g.selectAll("rect")
+        .data(color.range().map(function(d, i) {
+          return {
+            x0: i ? x(color.domain()[i - 1]) : x.range()[0],
+            x1: i < color.domain().length ? x(color.domain()[i]) : x.range()[1],
+            z: d
+          };
+        }))
+      .enter().append("rect")
+        .attr("height", 10)
+        .attr("x", function(d) { return d.x0; })
+        .attr("width", function(d) { return d.x1 - d.x0; })
+        .style("fill", function(d) { return d.z; });
+
+    g.call(xAxis).append("text")
+        .attr("class", "caption")
+        .attr("y", 21)
+        .text('Median Income');
+          
+
+          
+          var circle_1 = L.circle([32.229253, -110.873651], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_1.bindPopup("Kimpo Market");
+      circle_1._popup.options.maxWidth = 300;
+          map.addLayer(circle_1)
+          
+          var circle_2 = L.circle([32.2201947604, -110.807966404], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_2.bindPopup("Walmart Neighborhood Market");
+      circle_2._popup.options.maxWidth = 300;
+          map.addLayer(circle_2)
+          
+          var circle_3 = L.circle([32.1183835816, -110.798277855], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_3.bindPopup("Safeway");
+      circle_3._popup.options.maxWidth = 300;
+          map.addLayer(circle_3)
+          
+          var circle_4 = L.circle([32.2569304445, -110.943686881], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_4.bindPopup("India Dukaan");
+      circle_4._popup.options.maxWidth = 300;
+          map.addLayer(circle_4)
+          
+          var circle_5 = L.circle([32.1931367124, -110.841854597], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_5.bindPopup("Walmart Neighborhood Market");
+      circle_5._popup.options.maxWidth = 300;
+          map.addLayer(circle_5)
+          
+          var circle_6 = L.circle([32.238275, -111.005408], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_6.bindPopup("Albertsons");
+      circle_6._popup.options.maxWidth = 300;
+          map.addLayer(circle_6)
+          
+          var circle_7 = L.circle([32.2519651803, -111.013018483], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_7.bindPopup("Safeway");
+      circle_7._popup.options.maxWidth = 300;
+          map.addLayer(circle_7)
+          
+          var circle_8 = L.circle([32.1615606366, -110.989994961], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_8.bindPopup("Food City");
+      circle_8._popup.options.maxWidth = 300;
+          map.addLayer(circle_8)
+          
+          var circle_9 = L.circle([32.3505990858, -110.973701125], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_9.bindPopup("Trader Joe's");
+      circle_9._popup.options.maxWidth = 300;
+          map.addLayer(circle_9)
+          
+          var circle_10 = L.circle([32.2642767462, -110.892461374], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_10.bindPopup("Fry's");
+      circle_10._popup.options.maxWidth = 300;
+          map.addLayer(circle_10)
+          
+          var circle_11 = L.circle([32.33901128, -111.0126586], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_11.bindPopup("Albertsons");
+      circle_11._popup.options.maxWidth = 300;
+          map.addLayer(circle_11)
+          
+          var circle_12 = L.circle([32.23644629, -110.916461349], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_12.bindPopup("Nur Market International Grocery & Deli");
+      circle_12._popup.options.maxWidth = 300;
+          map.addLayer(circle_12)
+          
+          var circle_13 = L.circle([32.2356718231, -110.921624783], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_13.bindPopup("Whole Foods Market");
+      circle_13._popup.options.maxWidth = 300;
+          map.addLayer(circle_13)
+          
+          var circle_14 = L.circle([32.2935724247, -111.01267502], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_14.bindPopup("Walmart Neighborhood Market");
+      circle_14._popup.options.maxWidth = 300;
+          map.addLayer(circle_14)
+          
+          var circle_15 = L.circle([32.2502503085, -110.984971157], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_15.bindPopup("costco");
+      circle_15._popup.options.maxWidth = 300;
+          map.addLayer(circle_15)
+          
+          var circle_16 = L.circle([32.1615087914, -110.941748431], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_16.bindPopup("Food City");
+      circle_16._popup.options.maxWidth = 300;
+          map.addLayer(circle_16)
+          
+          var circle_17 = L.circle([32.2342881964, -110.82550411], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_17.bindPopup("Frys");
+      circle_17._popup.options.maxWidth = 300;
+          map.addLayer(circle_17)
+          
+          var circle_18 = L.circle([32.2509181134, -110.839133263], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_18.bindPopup("Safeway");
+      circle_18._popup.options.maxWidth = 300;
+          map.addLayer(circle_18)
+          
+          var circle_19 = L.circle([32.1894179366, -110.970220004], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_19.bindPopup("Food city");
+      circle_19._popup.options.maxWidth = 300;
+          map.addLayer(circle_19)
+          
+          var circle_20 = L.circle([32.251719521, -110.969934762], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_20.bindPopup("Frys");
+      circle_20._popup.options.maxWidth = 300;
+          map.addLayer(circle_20)
+          
+          var circle_21 = L.circle([32.2358832167, -110.907744], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_21.bindPopup("Babylon Market");
+      circle_21._popup.options.maxWidth = 300;
+          map.addLayer(circle_21)
+          
+          var circle_22 = L.circle([32.242242047, -110.902199912], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_22.bindPopup("Sandyi Oriental Market");
+      circle_22._popup.options.maxWidth = 300;
+          map.addLayer(circle_22)
+          
+          var circle_23 = L.circle([32.2052012366, -110.842395931], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_23.bindPopup("Frys");
+      circle_23._popup.options.maxWidth = 300;
+          map.addLayer(circle_23)
+          
+          var circle_24 = L.circle([32.3488236537, -110.978393555], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_24.bindPopup("Walmart Neighborhood Market");
+      circle_24._popup.options.maxWidth = 300;
+          map.addLayer(circle_24)
+          
+          var circle_25 = L.circle([32.3366687698, -110.978183516], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_25.bindPopup("Whole Foods Market");
+      circle_25._popup.options.maxWidth = 300;
+          map.addLayer(circle_25)
+          
+          var circle_26 = L.circle([32.24921414, -110.8509948], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_26.bindPopup("Albertsons");
+      circle_26._popup.options.maxWidth = 300;
+          map.addLayer(circle_26)
+          
+          var circle_27 = L.circle([32.2054622579, -110.904307124], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_27.bindPopup("Fry's Food Store");
+      circle_27._popup.options.maxWidth = 300;
+          map.addLayer(circle_27)
+          
+          var circle_28 = L.circle([32.1050116543, -110.773945183], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_28.bindPopup("Fry's Food Store");
+      circle_28._popup.options.maxWidth = 300;
+          map.addLayer(circle_28)
+          
+          var circle_29 = L.circle([32.1800354781, -110.94767439], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_29.bindPopup("Tucson Marketplace");
+      circle_29._popup.options.maxWidth = 300;
+          map.addLayer(circle_29)
+          
+          var circle_30 = L.circle([32.3384183639, -111.045496404], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_30.bindPopup("Frys");
+      circle_30._popup.options.maxWidth = 300;
+          map.addLayer(circle_30)
+          
+          var circle_31 = L.circle([32.1474909571, -110.934035403], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_31.bindPopup("Walmart Neighborhood Market");
+      circle_31._popup.options.maxWidth = 300;
+          map.addLayer(circle_31)
+          
+          var circle_32 = L.circle([32.3242364349, -110.931316934], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_32.bindPopup("AJ's Fine Foods");
+      circle_32._popup.options.maxWidth = 300;
+          map.addLayer(circle_32)
+          
+          var circle_33 = L.circle([32.22352343, -110.9189878], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_33.bindPopup("Walmart Supercenter");
+      circle_33._popup.options.maxWidth = 300;
+          map.addLayer(circle_33)
+          
+          var circle_34 = L.circle([32.2588060343, -110.797169156], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_34.bindPopup("Safeway");
+      circle_34._popup.options.maxWidth = 300;
+          map.addLayer(circle_34)
+          
+          var circle_35 = L.circle([32.2513170636, -110.962279815], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_35.bindPopup("Fry's Food Store");
+      circle_35._popup.options.maxWidth = 300;
+          map.addLayer(circle_35)
+          
+          var circle_36 = L.circle([32.2652829565, -110.960638227], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_36.bindPopup("FoodCity");
+      circle_36._popup.options.maxWidth = 300;
+          map.addLayer(circle_36)
+          
+          var circle_37 = L.circle([32.2222773051, -110.824805625], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_37.bindPopup("Sprouts Farmers Market");
+      circle_37._popup.options.maxWidth = 300;
+          map.addLayer(circle_37)
+          
+          var circle_38 = L.circle([32.3499625216, -111.099689576], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_38.bindPopup("Frys");
+      circle_38._popup.options.maxWidth = 300;
+          map.addLayer(circle_38)
+          
+          var circle_39 = L.circle([32.280475, -110.959682], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_39.bindPopup("Fry's Food Store");
+      circle_39._popup.options.maxWidth = 300;
+          map.addLayer(circle_39)
+          
+          var circle_40 = L.circle([32.2062949323, -110.874113743], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_40.bindPopup("Walmart Neighborhood Market");
+      circle_40._popup.options.maxWidth = 300;
+          map.addLayer(circle_40)
+          
+          var circle_41 = L.circle([32.2509907021, -110.972658992], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_41.bindPopup("Grantstone Supermarket");
+      circle_41._popup.options.maxWidth = 300;
+          map.addLayer(circle_41)
+          
+          var circle_42 = L.circle([32.1867691861, -110.967303552], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_42.bindPopup("Fry's MarketPlace");
+      circle_42._popup.options.maxWidth = 300;
+          map.addLayer(circle_42)
+          
+          var circle_43 = L.circle([32.2194061279, -110.951202393], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_43.bindPopup("La Tortilla");
+      circle_43._popup.options.maxWidth = 300;
+          map.addLayer(circle_43)
+          
+          var circle_44 = L.circle([32.3359617669, -110.975203016], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_44.bindPopup("Safeway");
+      circle_44._popup.options.maxWidth = 300;
+          map.addLayer(circle_44)
+          
+          var circle_45 = L.circle([32.1853393719, -110.879189588], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_45.bindPopup("Fry's Food Store");
+      circle_45._popup.options.maxWidth = 300;
+          map.addLayer(circle_45)
+          
+          var circle_46 = L.circle([32.283609, -110.94467132], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_46.bindPopup("Trader Joe's");
+      circle_46._popup.options.maxWidth = 300;
+          map.addLayer(circle_46)
+          
+          var circle_47 = L.circle([32.326177129, -111.049175602], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_47.bindPopup("Costco Wholesale");
+      circle_47._popup.options.maxWidth = 300;
+          map.addLayer(circle_47)
+          
+          var circle_48 = L.circle([32.1652579586, -110.982281711], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_48.bindPopup("Fry's Food Store");
+      circle_48._popup.options.maxWidth = 300;
+          map.addLayer(circle_48)
+          
+          var circle_49 = L.circle([32.1328285909, -111.026436878], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_49.bindPopup("Walmart Neighborhood Market");
+      circle_49._popup.options.maxWidth = 300;
+          map.addLayer(circle_49)
+          
+          var circle_50 = L.circle([32.1044615387, -110.773515701], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_50.bindPopup("Fry's Gas Station");
+      circle_50._popup.options.maxWidth = 300;
+          map.addLayer(circle_50)
+          
+          var circle_51 = L.circle([32.1859822897, -111.091585832], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_51.bindPopup("Tina's Country Market");
+      circle_51._popup.options.maxWidth = 300;
+          map.addLayer(circle_51)
+          
+          var circle_52 = L.circle([32.228643, -110.990790725], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_52.bindPopup("Food City");
+      circle_52._popup.options.maxWidth = 300;
+          map.addLayer(circle_52)
+          
+          var circle_53 = L.circle([32.2279115849, -110.997981848], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_53.bindPopup("Safeway");
+      circle_53._popup.options.maxWidth = 300;
+          map.addLayer(circle_53)
+          
+          var circle_54 = L.circle([32.258178, -110.927179], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_54.bindPopup("Caravan Mideastern Foods");
+      circle_54._popup.options.maxWidth = 300;
+          map.addLayer(circle_54)
+          
+          var circle_55 = L.circle([32.2747266398, -110.874241803], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_55.bindPopup("Whole Foods Market");
+      circle_55._popup.options.maxWidth = 300;
+          map.addLayer(circle_55)
+          
+          var circle_56 = L.circle([32.1590101229, -110.987258936], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_56.bindPopup("Frys");
+      circle_56._popup.options.maxWidth = 300;
+          map.addLayer(circle_56)
+          
+          var circle_57 = L.circle([32.1348273754, -110.976612568], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_57.bindPopup("Food City");
+      circle_57._popup.options.maxWidth = 300;
+          map.addLayer(circle_57)
+          
+          var circle_58 = L.circle([32.1978658, -110.8225172], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_58.bindPopup("Fry4");
+      circle_58._popup.options.maxWidth = 300;
+          map.addLayer(circle_58)
+          
+          var circle_59 = L.circle([32.2237747908, -110.96293695], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_59.bindPopup("Empire Food Market");
+      circle_59._popup.options.maxWidth = 300;
+          map.addLayer(circle_59)
+          
+          var circle_60 = L.circle([32.33755864, -111.06337977], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_60.bindPopup("Safeway");
+      circle_60._popup.options.maxWidth = 300;
+          map.addLayer(circle_60)
+          
+          var circle_61 = L.circle([32.2064860007, -110.927084978], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_61.bindPopup("Food City");
+      circle_61._popup.options.maxWidth = 300;
+          map.addLayer(circle_61)
+          
+          var circle_62 = L.circle([32.2050686271, -110.842483242], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_62.bindPopup("Fry's Food Store");
+      circle_62._popup.options.maxWidth = 300;
+          map.addLayer(circle_62)
+          
+          var circle_63 = L.circle([32.1981865168, -110.893785954], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_63.bindPopup("Frys food");
+      circle_63._popup.options.maxWidth = 300;
+          map.addLayer(circle_63)
+          
+          var circle_64 = L.circle([32.164914314, -110.9420228], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_64.bindPopup("Fry's Food and Drug");
+      circle_64._popup.options.maxWidth = 300;
+          map.addLayer(circle_64)
+          
+          var circle_65 = L.circle([32.2432470056, -110.881040646], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_65.bindPopup("Carniceria \"La Noria\" III");
+      circle_65._popup.options.maxWidth = 300;
+          map.addLayer(circle_65)
+          
+          var circle_66 = L.circle([32.3223529185, -111.043755774], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_66.bindPopup("Sprouts Farmers Market");
+      circle_66._popup.options.maxWidth = 300;
+          map.addLayer(circle_66)
+          
+          var circle_67 = L.circle([32.2643458843, -110.971671939], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_67.bindPopup("Coronado Market");
+      circle_67._popup.options.maxWidth = 300;
+          map.addLayer(circle_67)
+          
+          var circle_68 = L.circle([32.3386001692, -111.049088279], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_68.bindPopup("Walmart Neighborhood Market");
+      circle_68._popup.options.maxWidth = 300;
+          map.addLayer(circle_68)
+          
+          var circle_69 = L.circle([32.2037371068, -110.9067636], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_69.bindPopup("Frys");
+      circle_69._popup.options.maxWidth = 300;
+          map.addLayer(circle_69)
+          
+          var circle_70 = L.circle([32.1864606803, -110.876477035], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_70.bindPopup("Davis-Monthan AFB Commissary");
+      circle_70._popup.options.maxWidth = 300;
+          map.addLayer(circle_70)
+          
+          var circle_71 = L.circle([32.29802, -110.99522], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_71.bindPopup("Albertsons");
+      circle_71._popup.options.maxWidth = 300;
+          map.addLayer(circle_71)
+          
+          var circle_72 = L.circle([32.2728981861, -110.993464479], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_72.bindPopup("El Herradero Supermarket");
+      circle_72._popup.options.maxWidth = 300;
+          map.addLayer(circle_72)
+          
+          var circle_73 = L.circle([32.23706294, -110.858488083], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_73.bindPopup("Trader Joe's");
+      circle_73._popup.options.maxWidth = 300;
+          map.addLayer(circle_73)
+          
+          var circle_74 = L.circle([32.2069645842, -110.949164615], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_74.bindPopup("Fry's Food Store");
+      circle_74._popup.options.maxWidth = 300;
+          map.addLayer(circle_74)
+          
+          var circle_75 = L.circle([32.2794999575, -110.986868907], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_75.bindPopup("quik mart");
+      circle_75._popup.options.maxWidth = 300;
+          map.addLayer(circle_75)
+          
+          var circle_76 = L.circle([32.1801774552, -110.982724131], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_76.bindPopup("Fry's Food Store");
+      circle_76._popup.options.maxWidth = 300;
+          map.addLayer(circle_76)
+          
+          var circle_77 = L.circle([32.1907616414, -110.926927808], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_77.bindPopup("Sonora Market");
+      circle_77._popup.options.maxWidth = 300;
+          map.addLayer(circle_77)
+          
+          var circle_78 = L.circle([32.3387683596, -111.045659407], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_78.bindPopup("Fry's Food Store");
+      circle_78._popup.options.maxWidth = 300;
+          map.addLayer(circle_78)
+          
+          var circle_79 = L.circle([32.220852, -110.787928], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_79.bindPopup("Albertsons");
+      circle_79._popup.options.maxWidth = 300;
+          map.addLayer(circle_79)
+          
+          var circle_80 = L.circle([32.3504551206, -110.9755826], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_80.bindPopup("Walmart Neighborhood Market");
+      circle_80._popup.options.maxWidth = 300;
+          map.addLayer(circle_80)
+          
+          var circle_81 = L.circle([32.1858437809, -110.969469061], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_81.bindPopup("El Super - Tucson");
+      circle_81._popup.options.maxWidth = 300;
+          map.addLayer(circle_81)
+          
+          var circle_82 = L.circle([32.0832885902, -110.825958126], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_82.bindPopup("Walmart Supercenter");
+      circle_82._popup.options.maxWidth = 300;
+          map.addLayer(circle_82)
+          
+          var circle_83 = L.circle([32.339171, -111.045292], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_83.bindPopup("Frys Produce");
+      circle_83._popup.options.maxWidth = 300;
+          map.addLayer(circle_83)
+          
+          var circle_84 = L.circle([32.19066629, -110.771099], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_84.bindPopup("Walmart Supercenter");
+      circle_84._popup.options.maxWidth = 300;
+          map.addLayer(circle_84)
+          
+          var circle_85 = L.circle([32.17954, -111.0021], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_85.bindPopup("Food city");
+      circle_85._popup.options.maxWidth = 300;
+          map.addLayer(circle_85)
+          
+          var circle_86 = L.circle([32.1487709447, -110.912613755], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_86.bindPopup("Choice Market");
+      circle_86._popup.options.maxWidth = 300;
+          map.addLayer(circle_86)
+          
+          var circle_87 = L.circle([32.20636, -110.8890735], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_87.bindPopup("G & L Imports");
+      circle_87._popup.options.maxWidth = 300;
+          map.addLayer(circle_87)
+          
+          var circle_88 = L.circle([32.1563723106, -110.936084446], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_88.bindPopup("Frys");
+      circle_88._popup.options.maxWidth = 300;
+          map.addLayer(circle_88)
+          
+          var circle_89 = L.circle([32.2226759287, -110.971390079], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_89.bindPopup("Rae's Place");
+      circle_89._popup.options.maxWidth = 300;
+          map.addLayer(circle_89)
+          
+          var circle_90 = L.circle([32.2735189776, -110.945212029], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_90.bindPopup("Safeway");
+      circle_90._popup.options.maxWidth = 300;
+          map.addLayer(circle_90)
+          
+          var circle_91 = L.circle([32.20661777, -110.8559949], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_91.bindPopup("Albertsons");
+      circle_91._popup.options.maxWidth = 300;
+          map.addLayer(circle_91)
+          
+          var circle_92 = L.circle([32.23507147, -110.811155], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_92.bindPopup("Quik Mart");
+      circle_92._popup.options.maxWidth = 300;
+          map.addLayer(circle_92)
+          
+          var circle_93 = L.circle([32.219840246, -110.771419091], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_93.bindPopup("Safeway");
+      circle_93._popup.options.maxWidth = 300;
+          map.addLayer(circle_93)
+          
+          var circle_94 = L.circle([32.1050782574, -110.786540791], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_94.bindPopup("Frys");
+      circle_94._popup.options.maxWidth = 300;
+          map.addLayer(circle_94)
+          
+          var circle_95 = L.circle([32.2824392511, -110.977356892], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_95.bindPopup("99\u00a2 Only Stores");
+      circle_95._popup.options.maxWidth = 300;
+          map.addLayer(circle_95)
+          
+          var circle_96 = L.circle([32.2074561941, -110.791837501], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_96.bindPopup("Fry's Food Store");
+      circle_96._popup.options.maxWidth = 300;
+          map.addLayer(circle_96)
+          
+          var circle_97 = L.circle([32.190608688, -110.856028276], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_97.bindPopup("Safeway");
+      circle_97._popup.options.maxWidth = 300;
+          map.addLayer(circle_97)
+          
+          var circle_98 = L.circle([32.1690956136, -110.968252417], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_98.bindPopup("mercado y carniceria mexicana");
+      circle_98._popup.options.maxWidth = 300;
+          map.addLayer(circle_98)
+          
+          var circle_99 = L.circle([32.2578097167, -110.927114084], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_99.bindPopup("Aqua Vita");
+      circle_99._popup.options.maxWidth = 300;
+          map.addLayer(circle_99)
+          
+          var circle_100 = L.circle([32.2799821133, -110.96088854], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_100.bindPopup("Frys");
+      circle_100._popup.options.maxWidth = 300;
+          map.addLayer(circle_100)
+          
+          var circle_101 = L.circle([32.1922108012, -111.003378256], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_101.bindPopup("Mi Ranchito Market");
+      circle_101._popup.options.maxWidth = 300;
+          map.addLayer(circle_101)
+          
+          var circle_102 = L.circle([32.3066781873, -111.010235852], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_102.bindPopup("Bashas'");
+      circle_102._popup.options.maxWidth = 300;
+          map.addLayer(circle_102)
+          
+          var circle_103 = L.circle([32.249596, -110.872843266], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_103.bindPopup("Safeway");
+      circle_103._popup.options.maxWidth = 300;
+          map.addLayer(circle_103)
+          
+          var circle_104 = L.circle([32.2196881157, -110.805469351], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_104.bindPopup("Safeway");
+      circle_104._popup.options.maxWidth = 300;
+          map.addLayer(circle_104)
+          
+          var circle_105 = L.circle([32.2904656667, -110.995536767], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_105.bindPopup("Quick Mart");
+      circle_105._popup.options.maxWidth = 300;
+          map.addLayer(circle_105)
+          
+          var circle_106 = L.circle([32.1904305746, -110.842646224], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_106.bindPopup("Fry's Food Store");
+      circle_106._popup.options.maxWidth = 300;
+          map.addLayer(circle_106)
+          
+          var circle_107 = L.circle([32.2786827087, -110.944122314], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_107.bindPopup("City Wide Produce");
+      circle_107._popup.options.maxWidth = 300;
+          map.addLayer(circle_107)
+          
+          var circle_108 = L.circle([32.1773225521, -111.110250103], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_108.bindPopup("Frys");
+      circle_108._popup.options.maxWidth = 300;
+          map.addLayer(circle_108)
+          
+          var circle_109 = L.circle([32.2498154648, -110.891140011], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_109.bindPopup("Trader Joe's");
+      circle_109._popup.options.maxWidth = 300;
+          map.addLayer(circle_109)
+          
+          var circle_110 = L.circle([32.15717137, -111.02871], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_110.bindPopup("Super Carniceria Del Valle");
+      circle_110._popup.options.maxWidth = 300;
+          map.addLayer(circle_110)
+          
+          var circle_111 = L.circle([32.2047961434, -110.812011756], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_111.bindPopup("Frys");
+      circle_111._popup.options.maxWidth = 300;
+          map.addLayer(circle_111)
+          
+          var circle_112 = L.circle([32.1646377846, -110.942004563], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_112.bindPopup("Fry's Food Store");
+      circle_112._popup.options.maxWidth = 300;
+          map.addLayer(circle_112)
+          
+          var circle_113 = L.circle([32.3201293624, -110.975517365], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_113.bindPopup("Joy Asian Market");
+      circle_113._popup.options.maxWidth = 300;
+          map.addLayer(circle_113)
+          
+          var circle_114 = L.circle([32.3580319926, -111.045684814], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_114.bindPopup("Bashas'");
+      circle_114._popup.options.maxWidth = 300;
+          map.addLayer(circle_114)
+          
+          var circle_115 = L.circle([32.2852111724, -110.959730114], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_115.bindPopup("Sprouts Farmers Market");
+      circle_115._popup.options.maxWidth = 300;
+          map.addLayer(circle_115)
+          
+          var circle_116 = L.circle([32.1905095959, -110.842547271], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_116.bindPopup("Frys");
+      circle_116._popup.options.maxWidth = 300;
+          map.addLayer(circle_116)
+          
+          var circle_117 = L.circle([32.2664882145, -110.893247207], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_117.bindPopup("Bashas'");
+      circle_117._popup.options.maxWidth = 300;
+          map.addLayer(circle_117)
+          
+          var circle_118 = L.circle([32.2516077032, -110.908516645], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_118.bindPopup("Walmart Neighborhood Market");
+      circle_118._popup.options.maxWidth = 300;
+          map.addLayer(circle_118)
+          
+          var circle_119 = L.circle([32.2268837155, -110.96543493], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_119.bindPopup("Food Conspiracy Co-op");
+      circle_119._popup.options.maxWidth = 300;
+          map.addLayer(circle_119)
+          
+          var circle_120 = L.circle([32.258543, -110.943861], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_120.bindPopup("Albertsons");
+      circle_120._popup.options.maxWidth = 300;
+          map.addLayer(circle_120)
+          
+          var circle_121 = L.circle([32.2197952391, -110.771750859], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_121.bindPopup("Haggen");
+      circle_121._popup.options.maxWidth = 300;
+          map.addLayer(circle_121)
+          
+          var circle_122 = L.circle([32.2027015686, -110.973480225], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_122.bindPopup("la primavera market");
+      circle_122._popup.options.maxWidth = 300;
+          map.addLayer(circle_122)
+          
+          var circle_123 = L.circle([32.2372904521, -110.893544078], 100, {
+                            color: 'black',
+                            fillColor: 'red',
+                            fillOpacity: 0.6
+                            });
+          circle_123.bindPopup("Sprouts Farmers Market");
+      circle_123._popup.options.maxWidth = 300;
+          map.addLayer(circle_123)
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+
+      };
+
+   </script>
+</body>
