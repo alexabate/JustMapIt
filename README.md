@@ -10,4 +10,4 @@ Useful extensions:
 - toggle between different census data on the map, e.g. population density and poverty index
 - identify low income/below poverty line areas greater than 15 minutes walk from a grocery store
 
-[Map](http://u.arizona.edu/~abate/arizona.html)
+[Here's the map](http://u.arizona.edu/~abate/arizona.html)
